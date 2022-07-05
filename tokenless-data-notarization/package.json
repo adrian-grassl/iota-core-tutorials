@@ -1,0 +1,17 @@
+{
+  "name": "proof-of-inclusion",
+  "version": "1.0.0",
+  "description": "Proof of Inclusion to the Tangle",
+  "main": "create-notarization.js",
+  "dependencies": {
+    "@iota/iota.js": "^1.9.0-stardust.19",
+    "@iota/util.js": "^1.8.6",
+    "big-integer": "^1.6.51",
+    "iota.crypto.js": "^0.4.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "Apache-2.0"
+}
