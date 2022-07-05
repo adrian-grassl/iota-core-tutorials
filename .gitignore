@@ -1,1 +1,8 @@
-# tbd
+node_modules
+build
+npm-debug.log
+.env
+.DS_Store
+
+# Exchanged information
+notarized-block.json
