@@ -1,5 +1,5 @@
 # Pattern: Tokenless Data Notarization
-- Notarization in this context is just a synonyme for proof of inclusion
+- This tutorial showcases the ability to proof the inclusion (Notarization) of a random dataset to the Tangle without the need to store data on it long term
 - It describes the process of embedding a block in the immutable data structure of the Tangle, which allows to proof block content wasn’t altered at a later point in time
 
 ## Pattern Description
@@ -9,18 +9,25 @@
 ### Architecture
 ![alt text](pattern.png)
 
-### What you will need
-- NodeJS
-- Hornet Node with INX PoI Plugin
-- iota.js
-- tbd
 
-### Steps
-1. **Prover:** ```node create-notarization.js```
-    - Attach dataset to the Tangle in a data block
-    - Wait for milestone confirmation of the block
-    - Fetch block together with notarization and store in Folder 'Exchange'
-    - Provide notarized block to **Verifier**
-2. **Verifier:** ```node verify-notarization.js```
-    - Receive notarized block from **Prover**
-    - Checks validity of notarized block
+### Stakeholder Infrastructure
+#### Prover
+- Operate a Shimmer or IOTA network node
+- Activate the Notarization/Proof-of-Inclusion Plugin
+#### Verifier
+- Operate a Shimmer or IOTA network node
+- Activate the Notarization/Proof-of-Inclusion Plugin
+
+### Stakeholder Steps
+#### Prover
+Running ```node create-notarization.js``` will execute the following steps:
+- Attach dataset to the Tangle in a data block
+- Wait for milestone confirmation of the block
+- Fetch block together with notarization and store (Write to file 'notarized-block.json')
+- Provide notarized block to **Verifier**
+
+
+#### Verifier
+Running ```node verify-notarization.js``` will execute the following steps:
+    - Receive notarized block from **Prover** (Read from file 'notarized-block.json')
+    - Check validity of notarized block
