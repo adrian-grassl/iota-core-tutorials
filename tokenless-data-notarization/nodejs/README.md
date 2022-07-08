@@ -1,7 +1,6 @@
 ### NodeJS Steps
 **Install necessary NPM packages:**
 ```sh
-$ cd nodejs
 $ npm install
 ```
 

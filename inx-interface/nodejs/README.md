@@ -1,18 +1,17 @@
 ### NodeJS Steps
 **Install necessary NPM packages:**
 ```sh
-$ cd nodejs
 $ npm install
 ```
 
 **Simple client example:**
 ```sh
-$ cd ./nodejs/simple-client/
+$ cd ./simple-client/
 $ node ./ReadBlock.js
 ```
 
 **Stream client example:**
 ```sh
-$ cd ./nodejs/stream-client/
+$ cd ./stream-client/
 $ node ./ListenToBlocks.js
 ```
