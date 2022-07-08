@@ -1,0 +1,305 @@
+syntax = "proto3";
+
+package inx;
+option go_package = "github.com/iotaledger/inx/go;inx";
+
+service INX {
+  // Node
+  rpc ReadNodeStatus(NoParams) returns (NodeStatus);
+  rpc ReadNodeConfiguration(NoParams) returns (NodeConfiguration);
+
+  // Milestones
+  rpc ReadMilestone(MilestoneRequest) returns (Milestone);
+  rpc ListenToLatestMilestones(NoParams) returns (stream Milestone);
+  rpc ListenToConfirmedMilestones(MilestoneRangeRequest) returns (stream Milestone);
+  rpc ComputeWhiteFlag(WhiteFlagRequest) returns (WhiteFlagResponse);
+  rpc ReadMilestoneCone(MilestoneRequest) returns (stream BlockWithMetadata);
+  rpc ReadMilestoneConeMetadata(MilestoneRequest) returns (stream BlockMetadata);
+
+  // Blocks
+  rpc ListenToBlocks(NoParams) returns (stream Block);
+  rpc ListenToSolidBlocks(NoParams) returns (stream BlockMetadata);
+  rpc ListenToReferencedBlocks(NoParams) returns (stream BlockMetadata);
+  rpc SubmitBlock(RawBlock) returns (BlockId);
+  rpc ReadBlock(BlockId) returns (RawBlock);
+  rpc ReadBlockMetadata(BlockId) returns (BlockMetadata);
+
+  // Tips
+  rpc RequestTips(TipsRequest) returns (TipsResponse);
+  rpc ListenToTipsMetrics(TipsMetricRequest) returns (stream TipsMetric);
+  rpc ListenToTipScoreUpdates(NoParams) returns (stream BlockMetadata);
+
+  // UTXO
+  rpc ReadUnspentOutputs(NoParams) returns (stream UnspentOutput);
+  
+  // A stream that yields updates to the ledger. A `LedgerUpdate` is sent for each milestone, even if `created` and `consumed` collections are empty for that milestone.
+  rpc ListenToLedgerUpdates(MilestoneRangeRequest) returns (stream LedgerUpdate);
+  rpc ListenToTreasuryUpdates(MilestoneRangeRequest) returns (stream TreasuryUpdate);
+  rpc ReadOutput(OutputId) returns (OutputResponse);
+  rpc ListenToMigrationReceipts(NoParams) returns (stream RawReceipt);
+
+  // REST API
+  rpc RegisterAPIRoute(APIRouteRequest) returns (NoParams);
+  rpc UnregisterAPIRoute(APIRouteRequest) returns (NoParams);
+  rpc PerformAPIRequest(APIRequest) returns (APIResponse);
+}
+
+message NoParams {}
+
+// Node
+message NodeConfiguration {
+  ProtocolParameters protocolParameters = 1;
+  uint32 milestonePublicKeyCount = 2;
+  repeated MilestoneKeyRange milestoneKeyRanges = 3;
+  BaseToken baseToken = 4;
+  repeated uint32 supportedProtocolVersions = 5;
+  repeated PendingProtocolParameters pendingProtocolParameters = 6;
+}
+
+message ProtocolParameters {
+  uint32 version = 1;
+  string networkName = 2;
+  string bech32HRP = 3;
+  uint32 minPoWScore = 4;
+  uint32 belowMaxDepth = 5;
+  RentStructure rentStructure = 6;
+  uint64 tokenSupply = 7;
+}
+
+message PendingProtocolParameters {
+  uint32 targetMilestoneIndex = 1;
+  uint32 version = 2;
+  bytes params = 3;
+}
+
+message BaseToken {
+  string name = 1;
+  string tickerSymbol = 2;
+  string unit = 3;
+  string subunit = 4;
+  uint32 decimals = 5;
+  bool useMetricPrefix = 6;
+}
+
+message MilestoneKeyRange {
+  bytes publicKey = 1;
+  uint32 startIndex = 2;
+  uint32 endIndex = 3;
+}
+
+message RentStructure {
+  uint32 vByteCost = 1;
+  uint32 vByteFactorData = 2;
+  uint32 vByteFactorKey = 3;
+}
+
+message NodeStatus {
+  bool isHealthy = 1;
+  Milestone latestMilestone = 2;
+  Milestone confirmedMilestone = 3;
+  uint32 tanglePruningIndex = 4;
+  uint32 milestonesPruningIndex = 5;
+  uint32 ledgerPruningIndex = 6;
+  uint32 ledgerIndex = 7;
+}
+
+// Milestones
+message RawMilestone {
+  bytes data = 1;
+}
+
+message MilestoneId {
+  bytes id = 1;
+}
+
+message MilestoneRequest {
+  uint32 milestoneIndex = 1;
+  MilestoneId milestoneId = 2;
+}
+
+message MilestoneRangeRequest {
+  // startMilestoneIndex is the initial milestone to get. Use 0 to start from the current node status.
+  uint32 startMilestoneIndex = 1;
+  // endMilestoneIndex is the last milestone to get (inclusive). Use 0 to keep getting new confirmed milestones.
+  uint32 endMilestoneIndex = 2;
+}
+
+message MilestoneInfo {
+  // Optional. This field can be missing for example if there are no milestones yet in a network.
+  MilestoneId milestoneId = 1;
+  uint32 milestoneIndex = 2;
+  // Optional. This field can be missing for example if there are no milestones yet in a network.
+  uint32 milestoneTimestamp = 3;
+}
+
+message Milestone {
+  MilestoneInfo milestoneInfo = 1;
+  // Optional. This field can be missing for example if there are no milestones yet in a network.
+  RawMilestone milestone = 2;
+}
+
+message WhiteFlagRequest {
+  uint32 milestoneIndex = 1;
+  uint32 milestoneTimestamp = 2;
+  repeated BlockId parents = 3;
+  MilestoneId previousMilestoneId = 4;
+}
+
+message WhiteFlagResponse {
+  bytes milestoneInclusionMerkleRoot = 1;
+  bytes milestoneAppliedMerkleRoot = 2;
+}
+
+// Blocks
+message RawBlock {
+  bytes data = 1;
+}
+
+message BlockId {
+  bytes id = 1;
+}
+
+message Block {
+  BlockId blockId = 1;
+  RawBlock block = 2;
+}
+
+message BlockWithMetadata {
+  BlockMetadata metadata = 1;
+  RawBlock block = 2;
+}
+
+message BlockMetadata {
+  BlockId blockId = 1;
+  repeated BlockId parents = 2;
+  bool solid = 3;
+  bool shouldPromote = 4;
+  bool shouldReattach = 5;
+  uint32 referencedByMilestoneIndex = 6;
+  uint32 milestoneIndex = 7;
+  enum LedgerInclusionState {
+    NO_TRANSACTION = 0;
+    INCLUDED = 1;
+    CONFLICTING = 2;
+  }
+  LedgerInclusionState ledgerInclusionState = 8;
+  enum ConflictReason {
+    NONE = 0;
+    INPUT_ALREADY_SPENT = 1;
+    INPUT_ALREADY_SPENT_IN_THIS_MILESTONE = 2;
+    INPUT_NOT_FOUND = 3;
+    INPUT_OUTPUT_SUM_MISMATCH = 4;
+    INVALID_SIGNATURE = 5;
+    TIMELOCK_NOT_EXPIRED = 6;
+    INVALID_NATIVE_TOKENS = 7;
+    RETURN_AMOUNT_NOT_FULFILLED = 8;
+    INVALID_INPUT_UNLOCK = 9;
+    INVALID_INPUTS_COMMITMENT = 10;
+    INVALID_SENDER = 11;
+    INVALID_CHAIN_STATE_TRANSITION = 12;
+    SEMANTIC_VALIDATION_FAILED = 255;
+  }
+  ConflictReason conflictReason = 9;
+  uint32 whiteFlagIndex = 10;
+}
+
+// Tips
+message TipsRequest {
+  uint32 count = 1;
+  bool allowSemiLazy = 2;
+}
+
+message TipsResponse {
+  repeated BlockId tips = 1;
+}
+
+message TipsMetricRequest {
+  uint32 intervalInMilliseconds = 1;
+}
+
+message TipsMetric {
+  uint32 nonLazyPoolSize = 1;
+  uint32 semiLazyPoolSize = 2;
+}
+
+// UTXO
+message TransactionId {
+  bytes id = 1;
+}
+
+message OutputId {
+  bytes id = 1;
+}
+
+message OutputResponse {
+  uint32 ledgerIndex = 1;
+  oneof payload {
+    LedgerOutput output = 2;
+    LedgerSpent spent = 3;
+  }
+}
+
+message UnspentOutput {
+  uint32 ledgerIndex = 1;
+  LedgerOutput output = 2;
+}
+
+message RawOutput {
+  bytes data = 1;
+}
+
+message LedgerOutput {
+  OutputId outputId = 1;
+  BlockId blockId = 2;
+  uint32 milestoneIndexBooked = 3;
+  uint32 milestoneTimestampBooked = 4;
+  RawOutput output = 5;
+}
+
+message LedgerSpent {
+  LedgerOutput output = 1;
+  TransactionId transactionIdSpent = 2;
+  uint32 milestoneIndexSpent = 3;
+  uint32 milestoneTimestampSpent = 4;
+}
+
+message TreasuryOutput {
+  MilestoneId milestoneId = 1;
+  uint64 amount = 2;
+}
+
+message LedgerUpdate {
+  uint32 milestoneIndex = 1;
+  repeated LedgerOutput created = 2;
+  repeated LedgerSpent consumed = 3;
+}
+
+message TreasuryUpdate {
+  uint32 milestoneIndex = 1;
+  TreasuryOutput created = 2;
+  TreasuryOutput consumed = 3;
+}
+
+message RawReceipt {
+  bytes data = 1;
+}
+
+// REST API
+message APIRouteRequest {
+  string route = 1;
+  string host = 2;
+  uint32 port = 3;
+}
+
+message APIRequest {
+  string method = 1;
+  string path = 2;
+  map<string, string> headers = 3;
+  bytes body = 4;
+}
+
+message APIResponse {
+  uint32 code = 1;
+  map<string, string>  headers = 2;
+  bytes body = 3;
+}
