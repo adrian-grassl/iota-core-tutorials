@@ -5,7 +5,7 @@ const client = require("../config/config.js");
 const consoleColor = '\x1b[36m%s\x1b[0m';
 
 async function run() {    
-    // Fetch and log a random tip
+    // Fetch random tip
     const TipsRequest = { count: 1, allowSemiLazy: false };
 
     const tipBlockId = await new Promise((resolve, reject) => {
@@ -22,7 +22,7 @@ async function run() {
         });
     })
     
-    // Fetch and log block of previously fetched tip
+    // Fetch block
     const blockIdBuff = Buffer.from(tipBlockId.toString(), "hex");
     const blockId = { id: blockIdBuff };
 
@@ -30,7 +30,17 @@ async function run() {
         if (error) {
             console.log(error);
         } else {
-            console.log(consoleColor, 'Block of random tip');
+            console.log(consoleColor, 'Block');
+            console.log(answer, '\n');
+        }
+    });
+    
+    // Fetch block metadata
+    await client.ReadBlockMetadata(blockId, function (error, answer) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log(consoleColor, 'Block Metadata');
             console.log(answer, '\n');
         }
     });
