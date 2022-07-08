@@ -1,2 +1,3 @@
 ### IOTA Core Tutorials & How To's
-1. Tokenless Data Notarization
+- Tokenless Data Notarization
+- INX Interface (gRPC)
