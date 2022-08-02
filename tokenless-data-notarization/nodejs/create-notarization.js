@@ -3,9 +3,12 @@ const {
     LocalPowProvider,
     sendData
 } = require('@iota/iota.js');
-const { nodeURL } = require('./config.js');
 const fs = require('fs');
 const fetch = require('node-fetch');
+
+const { networkConfig } = require("./networkConfig.js");
+const nodeURL = networkConfig.node;
+const explorerURL = networkConfig.explorer;
 
 
 // Some console output will be printed in a different color for better readability
