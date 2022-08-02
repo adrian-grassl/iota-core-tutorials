@@ -23,8 +23,8 @@ async function run() {
 
     const sendResult = await sendData(client, tag, data);
     const blockId = sendResult.blockId;
-    console.log(consoleColor, 'Attached Block ID:');
-    console.log(blockId, '\n');
+    console.log(consoleColor, 'Attached block:');
+    console.log(explorerURL+"block/"+blockId, '\n');
 
     const result = await getNotarization(client, nodeURL, blockId);
 
