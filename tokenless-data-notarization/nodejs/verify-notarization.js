@@ -1,6 +1,11 @@
-const { nodeURL } = require('./config.js');
+const { serializeBlock } = require('@iota/iota.js');
+const { Converter, WriteStream } = require('@iota/util.js');
+const { Blake2b } = require('@iota/crypto.js');
 const fs = require('fs');
 const fetch = require('node-fetch')
+
+const { networkConfig } = require("./networkConfig.js");
+const nodeURL = networkConfig.node;
 
 
 // Some console output will be printed in a different color for better readability
@@ -14,6 +19,10 @@ async function run() {
     console.log(consoleColor, 'Successfully imported notarized block from path:');
     console.log(filePath, '\n');
 
+    const blockID = await blockIdFromBlock(notarizedBlock.block);
+    console.log(consoleColor, 'BlockID of notarized block:');
+    console.log(blockID, '\n');
+
     const validity = await verifyNotarization(nodeURL, notarizedBlock);
     console.log(consoleColor, 'Validity of provided notarization:');
     console.log(validity, '\n');
@@ -23,7 +32,7 @@ async function verifyNotarization(nodeURL, notarizedBlock) {
     const poiPluginUrl = `${nodeURL}/api/poi/v1/validate`;
     
     const response = await fetch(poiPluginUrl, {
-        method: 'POST',
+        method: 'POST', 
         body: JSON.stringify(notarizedBlock),
         headers: { 'Content-Type': 'application/json' }
     })
@@ -32,5 +41,17 @@ async function verifyNotarization(nodeURL, notarizedBlock) {
     return result.valid;
 }
 
+async function blockIdFromBlock(block) {
+    const writeStream = new WriteStream();
+    
+    serializeBlock(writeStream, block);
+
+    const blockFinal = writeStream.finalBytes();
+    const blockHash = Blake2b.sum256(blockFinal);
+
+    const blockId = Converter.bytesToHex(blockHash, true);
+
+    return blockId;
+}
 
 run().catch((err) => console.error(err));
