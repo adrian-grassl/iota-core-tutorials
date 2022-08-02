@@ -27,14 +27,16 @@ async function run() {
     console.log(explorerURL+"block/"+blockId, '\n');
 
     const result = await getNotarization(client, nodeURL, blockId);
-
-    const filePath = `./notarized-block.json`;
-    fs.writeFileSync(filePath, JSON.stringify(result, null, 4));
-
-    console.log(consoleColor, 'Block successfully notarized and stored at:');
-    console.log(filePath, '\n');
     
-    console.log(consoleColor, 'Notarized block can now be handed over to the verifier');
+    if (result != false) {
+        const filePath = `./notarized-block.json`;
+        fs.writeFileSync(filePath, JSON.stringify(result, null, 4));
+    
+        console.log(consoleColor, 'Block successfully notarized and stored at:');
+        console.log(filePath, '\n');
+        
+        console.log(consoleColor, 'Notarized block can now be handed over to the verifier');
+    }
 }
 
 async function getNotarization(client, nodeURL, blockId) {
@@ -42,7 +44,7 @@ async function getNotarization(client, nodeURL, blockId) {
         console.log(consoleColor, 'Wait for milestone confirmation to get notarized block:');
 
         let i = 0;
-        while (i <= 10) {
+        while (i < 10) {
             i++;
             await sleep(1000);
 
@@ -52,7 +54,6 @@ async function getNotarization(client, nodeURL, blockId) {
                 console.log(`Try ${i}: Block was referenced by milestone #${blockMetadata.referencedByMilestoneIndex}`, '\n');
                 
                 const poiPluginUrl = `${nodeURL}/api/poi/v1/create/${blockId}`;
-                
                 const response = await fetch(poiPluginUrl);
                 const result = await response.json();
 
@@ -62,7 +63,8 @@ async function getNotarization(client, nodeURL, blockId) {
                 console.log(`Try ${i}: Block was not yet referenced by a milestone`);
             }
         }
-        return('Not confirmed by a milestone after 10s');
+        console.log(`Block was not referenced by a milestone after ${i} seconds.`);
+        return false;
 
     } catch (error) {
         console.log(error);
