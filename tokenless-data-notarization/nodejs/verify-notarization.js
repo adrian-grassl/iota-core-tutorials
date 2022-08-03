@@ -1,4 +1,4 @@
-const { serializeBlock } = require('@iota/iota.js');
+const { serializeBlock, TransactionHelper } = require('@iota/iota.js');
 const { Converter, WriteStream } = require('@iota/util.js');
 const { Blake2b } = require('@iota/crypto.js');
 const fs = require('fs');
@@ -24,7 +24,7 @@ async function run() {
 
     // Generate blockId from block content and log explorer link
     // The blockId is defined as the BLAKE2b-256 hash of the entire serialized block
-    const blockId = await blockIdFromBlock(notarizedBlock.block);
+    const blockId = TransactionHelper.calculateBlockId(notarizedBlock.block);
     console.log(consoleColor, 'Notarized block:');
     console.log(explorerURL+"block/"+blockId, '\n');
 
@@ -45,20 +45,6 @@ async function verifyNotarization(nodeURL, notarizedBlock) {
     const result = await response.json();
 
     return result.valid;
-}
-
-// Returns the BLAKE2b-256 hash of the entire serialized block => blockId
-async function blockIdFromBlock(block) {
-    const writeStream = new WriteStream();
-    
-    serializeBlock(writeStream, block);
-
-    const blockFinal = writeStream.finalBytes();
-    const blockHash = Blake2b.sum256(blockFinal);
-
-    const blockId = Converter.bytesToHex(blockHash, true);
-
-    return blockId;
 }
 
 run().catch((err) => console.error(err));
