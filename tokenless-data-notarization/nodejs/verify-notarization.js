@@ -7,6 +7,7 @@ const fetch = require('node-fetch')
 // Network configuration
 const { networkConfig } = require("./networkConfig.js");
 const nodeURL = networkConfig.node;
+const explorerURL = networkConfig.explorer;
 
 
 // For the sake of this tutorial, some console output will be printed in a different color for better readability
@@ -21,11 +22,11 @@ async function run() {
     console.log(consoleColor, 'Successfully imported notarized block from path:');
     console.log(filePath, '\n');
 
-    // Generate blockID from block content
-    // The blockID is defined as the BLAKE2b-256 hash of the entire serialized block
-    const blockID = await blockIdFromBlock(notarizedBlock.block);
-    console.log(consoleColor, 'BlockID of notarized block:');
-    console.log(blockID, '\n');
+    // Generate blockId from block content and log explorer link
+    // The blockId is defined as the BLAKE2b-256 hash of the entire serialized block
+    const blockId = await blockIdFromBlock(notarizedBlock.block);
+    console.log(consoleColor, 'Notarized block:');
+    console.log(explorerURL+"block/"+blockId, '\n');
 
     // Verify provided notarization/proof of inclusion for block
     const validity = await verifyNotarization(nodeURL, notarizedBlock);
