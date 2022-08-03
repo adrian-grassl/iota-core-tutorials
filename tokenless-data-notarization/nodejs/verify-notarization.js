@@ -1,6 +1,4 @@
-const { serializeBlock, TransactionHelper } = require('@iota/iota.js');
-const { Converter, WriteStream } = require('@iota/util.js');
-const { Blake2b } = require('@iota/crypto.js');
+const { TransactionHelper } = require('@iota/iota.js');
 const fs = require('fs');
 const fetch = require('node-fetch')
 
