@@ -1,9 +1,14 @@
+# Folders
 node_modules
 build
-npm-debug.log
-.DS_Store
-*.json
-.env
 *database
 *stronghold
 ipfs*
+
+# Variables
+.DS_Store
+.env
+
+# File types
+*.json
+*.log
