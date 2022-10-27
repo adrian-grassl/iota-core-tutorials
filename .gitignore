@@ -5,10 +5,10 @@ build
 *stronghold
 ipfs*
 
-# Variables
+# Files
 .DS_Store
 .env
+notarized-block.json
 
 # File types
-*.json
 *.log
