@@ -4,7 +4,8 @@
   "description": "Proof of Inclusion to the Tangle",
   "main": "create-notarization.js",
   "dependencies": {
-    "@iota/iota.js": "next"
+    "@iota/iota.js": "next",
+    "@iota/pow-neon.js": "^1.8.6"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

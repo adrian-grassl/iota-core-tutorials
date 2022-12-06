@@ -1,0 +1,18 @@
+{
+  "name": "wallet-setup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "create-mnemonic.js",
+  "dependencies": {
+    "@iota/wallet": "2.0.3-rc.1",
+    "bip39": "3.0.4",
+    "dotenv": "16.0.1",
+    "node-fetch": "2.6.7"
+  },
+
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "Apache-2.0"
+}
