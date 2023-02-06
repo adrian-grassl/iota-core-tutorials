@@ -10,24 +10,24 @@ const accountName = process.env.ACCOUNT_NAME;
 const consoleColor = '\x1b[36m%s\x1b[0m';
 
 async function run() {
-	try {
-		// Create a new account manager from existing database path
-		const manager = new AccountManager({
-			storagePath: `./${accountName}-database`,
-		});
+    try {
+        // Create a new account manager from existing database path
+        const manager = new AccountManager({
+        storagePath: `./${accountName}-database`,
+        });
 
-		// Pass password to manager
-		await manager.setStrongholdPassword(password);
+        // Pass password to manager
+        await manager.setStrongholdPassword(password);
 
-		// Get specific account from account manager
-		const account = await manager.getAccount(accountName);
-
+        // Get specific account from account manager
+        const account = await manager.getAccount(accountName);
+        
         // Always sync before getting the account balance
-		await account.sync();
-		const balance = await account.getBalance();
+        await account.sync();
+        const balance = await account.getBalance();
 
-		console.log(consoleColor, `${accountName}'s Balance:`);
-		console.log(balance, '\n');
+        console.log(consoleColor, `${accountName}'s Balance:`);
+        console.log(balance, '\n');
 
     } catch (error) {
         console.log('Error: ', error);

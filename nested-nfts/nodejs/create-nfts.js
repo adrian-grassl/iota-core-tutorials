@@ -5,7 +5,7 @@ const IPFS = require('ipfs-core');
 const fs = require('fs');
 
 // Environment variables
-require('dotenv').config({ path: './.env' });
+require('dotenv').config();
 const password = process.env.SH_PASSWORD;
 const accountName = process.env.ACCOUNT_NAME;
 
@@ -22,11 +22,9 @@ async function startIpfsNode() {
 	console.log('\n');
 	console.log(consoleColor, `Start local IPFS node for upload:`);
 	
-	let node = await IPFS.create({
+	return await IPFS.create({
 		repo: `ipfs_node`,
 	});
-
-	return node;
 }
 
 // This function receives a running ipfs node instance and a file path for the upload
@@ -136,7 +134,6 @@ async function main() {
 	} catch (error) {
 		console.log('Error: ', error);
 	}
-	process.exit(0);
 }
 
 main();

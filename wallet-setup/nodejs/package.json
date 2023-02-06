@@ -4,12 +4,13 @@
   "description": "",
   "main": "create-mnemonic.js",
   "dependencies": {
-    "@iota/wallet": "2.0.3-rc.1",
+    "@iota/client": "3.0.0-rc.5",
+    "@iota/wallet": "2.0.3-rc.9",
     "bip39": "3.0.4",
     "dotenv": "16.0.1",
-    "node-fetch": "2.6.7"
+    "node-fetch": "2.6.7",
+    "ipfs-core": "0.10.8"
   },
-
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
